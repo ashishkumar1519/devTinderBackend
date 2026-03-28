@@ -100,22 +100,68 @@ The platform supports the following connection statuses:
 
 8. **Configure Environment Variables**
    - Copy `.env.example` to `.env`
-   - Update database and API configuration
+   - Update database credentials and configuration
    ```bash
    cp envExample .env
    ```
 
-9. **Start the Server**
-   ```bash
-   npm start
-   ```
-   - The backend will be running on your EC2 instance
+9. **Update Database Password**
+   - Update your MongoDB password in `.env` file
+   - Ensure EC2 instance public IP is whitelisted on MongoDB server
+
+10. **Install PM2 Globally**
+    ```bash
+    npm install -g pm2
+    ```
+
+11. **Start Backend with PM2**
+    ```bash
+    pm2 start npm --name "devTinder-backend" --exec-mode cluster -- start
+    ```
+    - Alternative: `pm2 start src/index.js --name "devTinder-backend"`
+
+12. **Enable Startup on Reboot**
+    ```bash
+    pm2 startup
+    pm2 save
+    ```
+
+13. **Configure Nginx Reverse Proxy**
+    - This is configured on the frontend server (see Frontend README Step 12)
+    - Nginx will proxy `/api` requests to your backend on `localhost:3000`
+    - Make sure port 3000 is NOT exposed to the internet (only localhost)
+
+14. **Verify Backend is Running**
+    ```bash
+    pm2 status
+    pm2 logs devTinder-backend
+    ```
+
+### PM2 Commands for Management
+
+```bash
+pm2 list                          # View all running processes
+pm2 logs                          # View real-time logs
+pm2 logs devTinder-backend        # View logs for specific app
+pm2 stop devTinder-backend        # Stop the application
+pm2 restart devTinder-backend     # Restart the application
+pm2 delete devTinder-backend      # Remove from PM2
+pm2 flush devTinder-backend       # Clear logs
+```
+
+### Important Notes
+
+- **Database Access:** Ensure your MongoDB connection string in `.env` is correct and EC2 IP is whitelisted
+- **Port 3000:** Keep this port private (not exposed to internet). Only Nginx should access it via localhost
+- **Environment Variables:** Never commit `.env` file to git. Use `.env.example` for reference
+- **Logs:** Monitor with `pm2 logs` to troubleshoot issues
 
 ### Post-Deployment
-- Configure security groups to allow HTTP/HTTPS traffic
-- Set up domain name and SSL certificate (optional)
-- Monitor instance performance and logs
-- `rejected` - Connection request was rejected
+- Verify backend is running: `pm2 status`
+- Monitor logs: `pm2 logs devTinder-backend`
+- Test API endpoint through: `http://<ec2-ip>/api/` (proxied through Nginx)
+- Configure domain name and SSL certificate
+- Set up monitoring and alerts
 
 ## Architecture
 
