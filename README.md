@@ -48,6 +48,73 @@ The platform supports the following connection statuses:
 - `ignore` - User was ignored
 - `interested` - User showed interest
 - `accepted` - Connection request was accepted
+
+## Deployment
+
+### Prerequisites
+- AWS Account
+- EC2 instance access
+- SSH key pair (.pem file)
+
+### Deployment Steps
+
+1. **Sign up on AWS**
+   - Create an AWS account and sign in to AWS Console
+
+2. **Launch EC2 Instance**
+   - Go to EC2 Dashboard
+   - Click "Launch Instances"
+   - Select Ubuntu 20.04 LTS AMI
+   - Choose t2.micro or appropriate instance type
+   - Complete the instance launch process
+
+3. **Setup SSH Key**
+   ```bash
+   chmod 400 <secret>.pem
+   ```
+   - Replace `<secret>` with your actual key pair name
+
+4. **Connect to Your Instance**
+   ```bash
+   ssh -i "devTinder-secret.pem" ubuntu@<your-ec2-public-ip>
+   ```
+   - Replace `<your-ec2-public-ip>` with your instance's public IP address
+
+5. **Install Node.js**
+   ```bash
+   curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   node --version  # Verify installation
+   ```
+
+6. **Clone Repository**
+   ```bash
+   git clone <your-repository-url>
+   cd backend
+   ```
+
+7. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+8. **Configure Environment Variables**
+   - Copy `.env.example` to `.env`
+   - Update database and API configuration
+   ```bash
+   cp envExample .env
+   ```
+
+9. **Start the Server**
+   ```bash
+   npm start
+   ```
+   - The backend will be running on your EC2 instance
+
+### Post-Deployment
+- Configure security groups to allow HTTP/HTTPS traffic
+- Set up domain name and SSL certificate (optional)
+- Monitor instance performance and logs
 - `rejected` - Connection request was rejected
 
 ## Architecture
