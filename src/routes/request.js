@@ -2,6 +2,7 @@ const express = require('express');
 const { userAuth } = require('../middlewares/auth');
 const { ConnectionRequestModel } = require('../Models/connectionRequest');
 const { UserModel } = require('../Models/user.model');
+const sendEmail = require("../utils/sendEmail")
 const { connect } = require('mongoose');
 const requestrouter = express.Router();
 
@@ -41,7 +42,8 @@ requestrouter.post("/request/send/:status/:toUserId",userAuth,async(req,res)=>{
 
         const data = await connectionRequest.save();
         res.json({message: "Connection request sent successfully", data});
-
+        const emailres= await sendEmail.run();
+        console.log(emailres)
     }
     catch(err){
         res.status(500).send("Err " + err.message);

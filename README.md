@@ -49,12 +49,74 @@ The platform supports the following connection statuses:
 - `interested` - User showed interest
 - `accepted` - Connection request was accepted
 
+## Email Setup via AWS SES
+
+This project uses Amazon SES (Simple Email Service) to send emails when connection requests are made.
+
+### Prerequisites
+
+- AWS Account
+- AWS SES Verified Identity
+
+### Setup Steps
+
+1. **Create an IAM User**
+   - Go to AWS IAM Console
+   - Create a new user for SES access
+
+2. **Grant SES Permissions**
+   - Attach the `AmazonSESFullAccess` policy to the IAM user
+
+3. **Create Access Credentials**
+   - Generate Access Key ID and Secret Access Key in IAM
+   - Store these credentials securely
+
+4. **Setup SES Identity**
+   - Go to AWS SES Console
+   - Create an Identity (domain or email address)
+   - Verify your domain name or email address
+
+5. **Configure Environment Variables**
+   - Create a `.env` file in the backend folder with:
+   ```
+   AWS_ACCESS_KEY = "your_access_key_id"
+   AWS_SES_SECRET_KEY = "your_secret_access_key"
+   MONGODBURL = "your_mongodb_connection_string"
+   ```
+
+6. **Install Dependencies**
+   ```bash
+   npm install dotenv @aws-sdk/client-ses
+   ```
+
+### How Email Sending Works
+
+- When a user sends a connection request, an email is automatically sent
+- Currently configured to send to test email addresses (dummy emails for testing)
+- Emails are sent asynchronously in the background
+- Region: Asia Pacific (Mumbai) - `ap-south-1`
+
+### Email Configuration Files
+
+- **SesClinet.js** - Initializes AWS SES Client with credentials
+- **sendEmail.js** - Handles email sending logic
+- **request.js** - Triggers email when connection request is made
+
 ## Deployment
 
 ### Prerequisites
 - AWS Account
 - EC2 instance access
 - SSH key pair (.pem file)
+
+### Before Deployment
+
+1. **Add .env to .gitignore**
+   - Make sure `.env` is in your `.gitignore` file so credentials aren't pushed to GitHub
+   ```
+   # In .gitignore
+   .env
+   ```
 
 ### Deployment Steps
 
@@ -96,6 +158,26 @@ The platform supports the following connection statuses:
 7. **Install Dependencies**
    ```bash
    npm install
+   ```
+
+8. **Create Environment Variables on EC2**
+   - Create `.env` file in the backend folder
+   ```bash
+   nano .env
+   ```
+   - Add your credentials (paste and modify):
+   ```
+   MONGODBURL = "your_mongodb_connection_string"
+   AWS_ACCESS_KEY = "your_aws_access_key_id"
+   AWS_SES_SECRET_KEY = "your_aws_secret_access_key"
+   ```
+   - Save: Press `Ctrl + X`, then `Y`, then `Enter`
+
+9. **Start the Server**
+   ```bash
+   npm start
+   # or for development with auto-reload
+   npm run dev
    ```
 
 8. **Configure Environment Variables**
